@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 460894007a418c249b25317c0a82d658
+guid: 338f364c60acce547ad682f90449e58e
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -117,11 +117,11 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: player_sprite_sheet_0
+      name: cave_walls_reduced_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 192
+        y: 0
         width: 64
         height: 64
       alignment: 0
@@ -131,18 +131,18 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1d11a7a9f5743f1448cc3298c610717b
-      internalID: 1565479210
+      spriteID: f086ddb6b44da404cbd455ee1cc1ad78
+      internalID: 1783446021
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_sprite_sheet_1
+      name: cave_walls_reduced_1
       rect:
         serializedVersion: 2
         x: 64
-        y: 192
+        y: 0
         width: 64
         height: 64
       alignment: 0
@@ -152,18 +152,18 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ca5db31a70d381d4d937bf6c442b70b5
-      internalID: 996151742
+      spriteID: 115d15cfdc9005448a5c057f2d0f893e
+      internalID: 1406868554
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_sprite_sheet_2
+      name: cave_walls_reduced_2
       rect:
         serializedVersion: 2
         x: 128
-        y: 192
+        y: 0
         width: 64
         height: 64
       alignment: 0
@@ -173,18 +173,18 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 501ed49c13026294d8900c91216e6066
-      internalID: 992789515
+      spriteID: 3bcfe7bdcd318f7428c53243a5e9cb67
+      internalID: 1756506547
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_sprite_sheet_3
+      name: cave_walls_reduced_3
       rect:
         serializedVersion: 2
         x: 192
-        y: 192
+        y: 0
         width: 64
         height: 64
       alignment: 0
@@ -194,8 +194,92 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 217ea103124e20b4f8e307fb414134c1
-      internalID: 2139849044
+      spriteID: 4608fce39dfab704a820fb6b41168149
+      internalID: -1918615149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cave_walls_reduced_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ea4057a08e7cd964fb15df05d78c7fb8
+      internalID: -929683400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cave_walls_reduced_5
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f5b5cf4cf4eef64fb4c541ad9242eec
+      internalID: -360543334
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cave_walls_reduced_6
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3202321a37b6ea64d9e9859c10577647
+      internalID: -1107749276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cave_walls_reduced_7
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 447ad70ec71638b4fa7abd5b20c1c7bc
+      internalID: 1255049881
       vertices: []
       indices: 
       edges: []
@@ -211,10 +295,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      player_sprite_sheet_0: 1565479210
-      player_sprite_sheet_2: 992789515
-      player_sprite_sheet_3: 2139849044
-      player_sprite_sheet_1: 996151742
+      cave_walls_reduced_7: 1255049881
+      cave_walls_reduced_3: -1918615149
+      cave_walls_reduced_0: 1783446021
+      cave_walls_reduced_4: -929683400
+      cave_walls_reduced_1: 1406868554
+      cave_walls_reduced_2: 1756506547
+      cave_walls_reduced_6: -1107749276
+      cave_walls_reduced_5: -360543334
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
