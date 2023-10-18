@@ -12,11 +12,21 @@ public class player_script : MonoBehaviour
     public float directionChangeSmoothness = 2.3f; // Controls the smoothness of direction changes when floating freely
     public float objectContactDirectionChangeSmoothness = 5.0f; // Controls the smoothness of direction changes when in contact with objects
     public float stoppingDeceleration = 1.0f; // Controls how quickly the player stops when no input is given
+    public LayerMask wallLayer;
 
     private Rigidbody2D rb;
     private bool isTouchingObject = false;
     private bool canDash = true;
     private bool isDashing;
+    private bool isBouncing = false;
+
+    public int health = 3000;
+    public int healthIntensity;
+    public float knockbackPower = 5.0f;
+    private bool isKnockedBack = false;
+    private Vector2 knockbackVelocity;
+    public float knockbackDecayRate = 0.9f; // Adjust this for faster/slower decay. Closer to 1.0 means slower decay.
+
 
     [SerializeField] private TrailRenderer tr;
 
@@ -48,8 +58,11 @@ public class player_script : MonoBehaviour
         // Apply the target velocity when the player isn't dashing
         if (!isDashing)
         {
-            rb.velocity = targetVelocity;
+            rb.velocity = targetVelocity + knockbackVelocity;
         }
+
+        // Decay the knockback velocity
+        knockbackVelocity *= knockbackDecayRate;
 
         // If not touching an object, apply rotational damping
         if (!isTouchingObject)
@@ -58,15 +71,44 @@ public class player_script : MonoBehaviour
         }
 
         // Handle propulsion when pressing the spacebar
-        if (Input.GetKeyDown(KeyCode.Space) && canDash)
+        if (Input.GetKeyDown(KeyCode.Space) && canDash && !isBouncing)
         {
             // Start a dash
             StartCoroutine(Dash());
         }
     }
 
+    public void TakeDamage(int damageAmount)
+    {
+        health -= damageAmount;
+        CheckDeath();
+    }
+
+    private void CheckDeath()
+    {
+        if (health <= 0)
+        {
+            // Here, you can trigger any event you want when the player "dies"
+            Debug.Log("Player is dead!");
+
+            // For now, I'll just deactivate the player
+            this.gameObject.SetActive(false);
+        }
+    }
+
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
+
+        if (collision.gameObject.tag == "borb")
+        {
+            Vector2 knockbackDirection = (transform.position - collision.transform.position).normalized;
+            knockbackVelocity = knockbackDirection * knockbackPower; // Use the knockbackPower variable you have
+
+            StartCoroutine(KnockbackCooldown());
+            TakeDamage(1);
+        }
+
         // Set the flag when colliding with an object
         isTouchingObject = true;
     }
@@ -84,11 +126,42 @@ public class player_script : MonoBehaviour
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
 
-        // Dash in the current movement direction
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
         Vector2 dashDirection = new Vector2(horizontalInput, verticalInput).normalized;
+
+        // Define rayStart here
+        Vector2 rayStart = (Vector2)transform.position + dashDirection * 0.1f;  // Adjust the 0.1f offset as needed
+        // Raycast in the dash direction to check for obstacles
+        Debug.DrawRay(rayStart, dashDirection * dashPower, Color.red, 5f);
+        RaycastHit2D hit = Physics2D.Raycast(rayStart, dashDirection, dashPower - 0.1f, wallLayer);
+
+
+        if (hit.collider != null) 
+        {
+        Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
+        } else {
+            Debug.Log("Raycast did not hit anything.");
+        }
+        float dashDistance = dashPower;
+        if (hit.collider != null)
+        {
+            Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
+
+
+            // Calculate the reflection direction
+            Vector2 bounceDirection = Vector2.Reflect(dashDirection, hit.normal);
+
+            // Apply bounce velocity after the dash has ended (use a Coroutine or invoke to add a delay if necessary)
+            rb.velocity = bounceDirection * dashPower * 0.5f; // Using half the dashPower for the bounce
+        }
+        else
+        {
+            rb.velocity = dashDirection * dashPower;
+        }
+
         rb.velocity = dashDirection * dashPower;
+
 
         tr.emitting = true;
         yield return new WaitForSeconds(dashDuration);
@@ -98,4 +171,12 @@ public class player_script : MonoBehaviour
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
     }
+
+    private IEnumerator KnockbackCooldown()
+    {
+        yield return new WaitForSeconds(0.5f); // adjust the delay as needed
+        isKnockedBack = false;
+    }
+
+
 }

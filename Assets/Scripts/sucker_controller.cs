@@ -43,7 +43,7 @@ public class sucker_controller : MonoBehaviour
             lastTimePlayerInVicinity = Time.time;
             isFollowingPlayer = true;
 
-            Debug.Log("Player is in vicinity. Following player.");
+            //Debug.Log("Player is in vicinity. Following player.");
         }
         else
         {
@@ -58,7 +58,7 @@ public class sucker_controller : MonoBehaviour
                 // Stop moving.
                 rb.velocity = Vector2.zero;
                 isFollowingPlayer = false;
-                Debug.Log("Player is outside the vicinity. Stopping movement.");
+                //Debug.Log("Player is outside the vicinity. Stopping movement.");
             }
         }
     }
