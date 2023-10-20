@@ -23,17 +23,19 @@ public class player_script : MonoBehaviour
     public int health = 3000;
     public int healthIntensity;
     public float knockbackPower = 5.0f;
-    private bool isKnockedBack = false;
     private Vector2 knockbackVelocity;
     public float knockbackDecayRate = 0.9f; // Adjust this for faster/slower decay. Closer to 1.0 means slower decay.
 
 
-    [SerializeField] private TrailRenderer tr;
+
+    [SerializeField] private TrailRenderer trail;
 
     private Vector2 targetVelocity;
 
     private void Start()
     {
+        trail = GetComponent<TrailRenderer>();
+
         rb = GetComponent<Rigidbody2D>();
         targetVelocity = Vector2.zero;
     }
@@ -97,21 +99,7 @@ public class player_script : MonoBehaviour
     }
 
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-
-        if (collision.gameObject.tag == "borb")
-        {
-            Vector2 knockbackDirection = (transform.position - collision.transform.position).normalized;
-            knockbackVelocity = knockbackDirection * knockbackPower; // Use the knockbackPower variable you have
-
-            StartCoroutine(KnockbackCooldown());
-            TakeDamage(1);
-        }
-
-        // Set the flag when colliding with an object
-        isTouchingObject = true;
-    }
+    
 
     private void OnCollisionExit2D(Collision2D collision)
     {
@@ -130,6 +118,7 @@ public class player_script : MonoBehaviour
         float verticalInput = Input.GetAxis("Vertical");
         Vector2 dashDirection = new Vector2(horizontalInput, verticalInput).normalized;
 
+
         // Define rayStart here
         Vector2 rayStart = (Vector2)transform.position + dashDirection * 0.1f;  // Adjust the 0.1f offset as needed
         // Raycast in the dash direction to check for obstacles
@@ -137,23 +126,9 @@ public class player_script : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(rayStart, dashDirection, dashPower - 0.1f, wallLayer);
 
 
-        if (hit.collider != null) 
-        {
-        Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
-        } else {
-            Debug.Log("Raycast did not hit anything.");
-        }
-        float dashDistance = dashPower;
         if (hit.collider != null)
         {
             Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
-
-
-            // Calculate the reflection direction
-            Vector2 bounceDirection = Vector2.Reflect(dashDirection, hit.normal);
-
-            // Apply bounce velocity after the dash has ended (use a Coroutine or invoke to add a delay if necessary)
-            rb.velocity = bounceDirection * dashPower * 0.5f; // Using half the dashPower for the bounce
         }
         else
         {
@@ -163,20 +138,34 @@ public class player_script : MonoBehaviour
         rb.velocity = dashDirection * dashPower;
 
 
-        tr.emitting = true;
         yield return new WaitForSeconds(dashDuration);
-        tr.emitting = false;
         rb.gravityScale = originalGravity;
         isDashing = false;
+        StartCoroutine(DashCooldown());
+    }
+
+    private IEnumerator DashCooldown()
+    {
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
     }
 
-    private IEnumerator KnockbackCooldown()
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        yield return new WaitForSeconds(0.5f); // adjust the delay as needed
-        isKnockedBack = false;
+        float originalGravity = rb.gravityScale;
+
+        if (collision.gameObject.tag == "borb")
+        {
+            Vector2 knockbackDirection = (transform.position - collision.transform.position).normalized;
+            knockbackVelocity = knockbackDirection * knockbackPower; // Use the knockbackPower variable you have
+
+            TakeDamage(1);
+        }
+
+        // Set the flag when colliding with an object
+        isTouchingObject = true;
+
+
+
     }
-
-
 }

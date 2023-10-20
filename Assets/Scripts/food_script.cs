@@ -58,6 +58,21 @@ public class food_script : MonoBehaviour
 
     private void Update()
     {
+        if (player == null)
+        {
+            // Find the player again (in case it was destroyed and recreated)
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+            if (playerObject != null)
+            {
+                player = playerObject.transform;
+            }
+            else
+            {
+                return; // Exit the update if we can't find the player
+            }
+        }
+
         if (isDisappearing)
         {
             // Handle food disappearance

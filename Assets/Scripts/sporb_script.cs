@@ -1,73 +1,106 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pathfinding;
 
 public class sporb_script : MonoBehaviour
 {
-    public float roamRadius = 10f;
-    public float followRadius = 5f;
-    public float roamSpeed = 2f;
-    public float followSpeed = 4f;
+    public float speed = 1f;
+    public float turnSpeed = 5f; // Adjust as needed
+    public float detectionRadius = 1f;
+    public float patrolRadius = 3f;
 
-    private Transform player;
-    private UnityEngine.AI.NavMeshAgent agent;
-    private Vector3 roamPosition;
-    private float nextActionTime = 0f;
-    private float timeBetweenActions = 3f;
+    public Transform target;
+    Path path;
+    Seeker seeker;
+    Rigidbody2D rb;
+    int currentWaypoint = 0;
+    Vector2 initialPosition;
+
+    public float pathRefreshRate = .3f; // Time interval between path updates
 
     private void Start()
     {
-        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        player = GameObject.FindGameObjectWithTag("Player").transform; // Adjust the tag as needed.
+        seeker = GetComponent<Seeker>();
+        rb = GetComponent<Rigidbody2D>();
+        target = GameObject.FindGameObjectWithTag("Player").transform;
+        initialPosition = rb.position;
 
-        // Start with a random roam position.
-        roamPosition = GetRandomRoamPosition();
-        agent.speed = roamSpeed;
+        UpdatePath();
+        InvokeRepeating("UpdatePath", 0, pathRefreshRate);
     }
 
-    private void Update()
+    void UpdatePath()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-
-        if (distanceToPlayer <= followRadius)
+        if (Vector2.Distance(target.position, rb.position) <= detectionRadius)
         {
-            // Player is within follow range, chase the player.
-            agent.SetDestination(player.position);
-            agent.speed = followSpeed;
-
-            // Keep the enemy's orientation stable.
-            Vector3 lookAtPosition = new Vector3(player.position.x, transform.position.y, player.position.z);
-            transform.LookAt(lookAtPosition);
+            seeker.StartPath(rb.position, target.position, OnPathComplete);
         }
-        else if (Time.time > nextActionTime)
+        else
         {
-            // Player is outside follow range, or it's time for a new action.
-            if (distanceToPlayer > followRadius * 2)
-            {
-                // If player is far away, set a new roam position.
-                roamPosition = GetRandomRoamPosition();
-                agent.speed = roamSpeed;
-            }
-
-            // Move towards the current roam position.
-            agent.SetDestination(roamPosition);
-
-            // Keep the enemy's orientation stable.
-            Vector3 lookAtPosition = new Vector3(roamPosition.x, transform.position.y, roamPosition.z);
-            transform.LookAt(lookAtPosition);
-
-            // Schedule the next action.
-            nextActionTime = Time.time + timeBetweenActions;
+            Vector2 randomPoint = initialPosition + Random.insideUnitCircle * patrolRadius;
+            seeker.StartPath(rb.position, randomPoint, OnPathComplete);
         }
     }
 
-    private Vector3 GetRandomRoamPosition()
+    void OnPathComplete(Path p)
     {
-        // Generate a random point within the roam radius.
-        Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
-        randomDirection += transform.position;
-        UnityEngine.AI.NavMeshHit hit;
-        UnityEngine.AI.NavMesh.SamplePosition(randomDirection, out hit, roamRadius, 1);
-        return hit.position;
+        if (path != null)
+        {
+            path.Release(this); // Release the old path back to the pool
+        }
+
+        if (!p.error)
+        {
+            path = p;
+            path.Claim(this); // Claim the new path
+            currentWaypoint = 0;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (path != null)
+        {
+            path.Release(this);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (path != null)
+        {
+            path.Release(this);
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (path == null) return;
+
+        if (currentWaypoint >= path.vectorPath.Count)
+        {
+            return; // We've reached the end of the path
+        }
+
+        Vector2 direction = ((Vector2)path.vectorPath[currentWaypoint] - rb.position).normalized;
+        Vector2 force = direction * speed;
+
+        rb.AddForce(force);
+
+        float distance = Vector2.Distance(rb.position, path.vectorPath[currentWaypoint]);
+
+        if (distance < 0.5f)
+        {
+            currentWaypoint++;
+        }
+    }
+   
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+
+        Gizmos.DrawWireSphere(transform.position, patrolRadius);
     }
 }
