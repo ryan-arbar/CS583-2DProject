@@ -6,7 +6,7 @@ using Pathfinding;
 public class sporb_script : MonoBehaviour
 {
     public float speed = 1f;
-    public float turnSpeed = 5f; // Adjust as needed
+    public float turnSpeed = 5f;
     public float detectionRadius = 1f;
     public float patrolRadius = 3f;
 
@@ -46,32 +46,34 @@ public class sporb_script : MonoBehaviour
 
     void OnPathComplete(Path p)
     {
-        if (path != null)
-        {
-            path.Release(this); // Release the old path back to the pool
-        }
-
         if (!p.error)
         {
+            if (path != null)
+            {
+                path.Release(this, true); 
+            }
             path = p;
-            path.Claim(this); // Claim the new path
+            path.Claim(this);
             currentWaypoint = 0;
         }
     }
 
     private void OnDestroy()
     {
-        if (path != null)
-        {
-            path.Release(this);
-        }
+        ReleasePath();
     }
 
     private void OnDisable()
     {
+        ReleasePath();
+    }
+
+    private void ReleasePath()
+    {
         if (path != null)
         {
-            path.Release(this);
+            path.Release(this, true);
+            path = null;
         }
     }
 
@@ -81,7 +83,7 @@ public class sporb_script : MonoBehaviour
 
         if (currentWaypoint >= path.vectorPath.Count)
         {
-            return; // We've reached the end of the path
+            return;
         }
 
         Vector2 direction = ((Vector2)path.vectorPath[currentWaypoint] - rb.position).normalized;

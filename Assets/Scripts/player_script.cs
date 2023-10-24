@@ -80,6 +80,11 @@ public class player_script : MonoBehaviour
             // Start a dash
             StartCoroutine(Dash());
         }
+
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            health = 30000;
+        }
     }
 
     public void TakeDamage(int damageAmount)
