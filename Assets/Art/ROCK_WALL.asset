@@ -25,6 +25,7 @@ MonoBehaviour:
     - {fileID: -360543334, guid: 338f364c60acce547ad682f90449e58e, type: 3}
     - {fileID: -1107749276, guid: 338f364c60acce547ad682f90449e58e, type: 3}
     - {fileID: 1255049881, guid: 338f364c60acce547ad682f90449e58e, type: 3}
+    - {fileID: 21300000, guid: c01f17ff1800c9748a122efd813dc4f6, type: 3}
   m_FillTexture: {fileID: 0}
   m_CornerSprites:
   - m_CornerType: 0

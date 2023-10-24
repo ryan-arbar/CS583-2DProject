@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class sucker_controller : MonoBehaviour
 {
-    public Transform player; // Reference to the player's transform.
-    public Transform anchor; // Reference to the anchor's transform.
+    public Transform player;
+    public Transform anchor;
     public float moveSpeed = 5.0f;
-    public float rotationSpeed = 10.0f; // Adjust this value for smoothness.
-    public float vicinityRadius = 5.0f; // Adjust this value as needed.
-    public float inertiaDuration = 1.0f; // Adjust this value for the desired inertia duration.
+    public float rotationSpeed = 10.0f;
+    public float vicinityRadius = 5.0f;
+    public float inertiaDuration = 1.0f;
 
     private Rigidbody2D rb;
     private float lastTimePlayerInVicinity;
@@ -24,18 +24,16 @@ public class sucker_controller : MonoBehaviour
 
     private void Update()
     {
-        // Calculate the distance between the anchor and the player.
         float distanceToPlayer = Vector2.Distance(anchor.position, player.position);
 
         if (distanceToPlayer <= vicinityRadius)
         {
-            // Calculate the direction from the head to the player.
             Vector2 directionToPlayer = (player.position - transform.position).normalized;
 
-            // Set the velocity to move the head toward the player.
+            // Move the head toward the player.
             rb.velocity = directionToPlayer * moveSpeed;
 
-            // Smoothly rotate the head to face the player.
+            // Smoothly rotate the head to face player
             float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg;
             Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
@@ -50,7 +48,7 @@ public class sucker_controller : MonoBehaviour
             // Player is outside the vicinity.
             if (isFollowingPlayer && Time.time - lastTimePlayerInVicinity <= inertiaDuration)
             {
-                // Apply inertia to keep moving for a short duration.
+                // Apply inertia to keep moving for a short duration
                 rb.velocity = rb.velocity.normalized * moveSpeed;
             }
             else
@@ -58,7 +56,7 @@ public class sucker_controller : MonoBehaviour
                 // Stop moving.
                 rb.velocity = Vector2.zero;
                 isFollowingPlayer = false;
-                //Debug.Log("Player is outside the vicinity. Stopping movement.");
+                //Debug.Log("Player is outside radius");
             }
         }
     }

@@ -7,7 +7,7 @@ public class borb_script : MonoBehaviour
 {
 
     public float speed = 1f;
-    public float turnSpeed = 5f; // Adjust as needed
+    public float turnSpeed = 5f;
     public float detectionRadius = 1f;
 
 
@@ -59,26 +59,10 @@ public class borb_script : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
-    {
-        if (path != null)
-        {
-            path.Release(this);
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (path != null)
-        {
-            path.Release(this);
-        }
-    }
-
     void FacePlayer()
     {
         Vector2 direction = (target.position - transform.position).normalized;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90; // Adjust based on your sprite's orientation
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90; // Adjusted 90 degrees to fix the sprite
         Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * turnSpeed);
     }
@@ -99,19 +83,13 @@ public class borb_script : MonoBehaviour
         {
             FacePlayer();
 
-            // If ready to dash, apply a force in the direction the enemy is facing
+            // Dash where borb is facing
             if (Time.time > nextDashTime)
             {
                     rb.AddForce(transform.up * dashForce, ForceMode2D.Impulse);
                     nextDashTime = Time.time + dashCooldown;
             }
         }
-        else
-        {
-            //ATTACK CODE
-        }
-
-        
     }
 
     void OnDrawGizmosSelected()

@@ -1,17 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class player_script : MonoBehaviour
 {
+    public TextMeshProUGUI congratulationsText;
+
     public float swimSpeed = 3.0f;
-    public float dashPower = 10.0f; // Force applied when pressing spacebar for a dash
-    public float dashDuration = 0.2f; // Duration of the dash
-    public float dashCooldown = 1.0f; // Cooldown period between dashes
-    public float rotationDamping = 0.4f; // Controls how quickly the player stops spinning after a collision
-    public float directionChangeSmoothness = 2.3f; // Controls the smoothness of direction changes when floating freely
-    public float objectContactDirectionChangeSmoothness = 5.0f; // Controls the smoothness of direction changes when in contact with objects
-    public float stoppingDeceleration = 1.0f; // Controls how quickly the player stops when no input is given
+    public float dashPower = 10.0f;
+    private float dashDuration = 0.2f;
+    public float dashCooldown = 1.0f;
+    private float rotationDamping = 0.4f;
+    private float directionChangeSmoothness = 2.3f;
+    private float objectContactDirectionChangeSmoothness = 5.0f;
+    private float stoppingDeceleration = 1.0f;
     public LayerMask wallLayer;
 
     private Rigidbody2D rb;
@@ -21,11 +24,15 @@ public class player_script : MonoBehaviour
     private bool isBouncing = false;
 
     public int health = 3000;
-    public int healthIntensity;
-    public float knockbackPower = 5.0f;
+    private float borbKnockbackPower = 5.0f;
     private Vector2 knockbackVelocity;
-    public float knockbackDecayRate = 0.9f; // Adjust this for faster/slower decay. Closer to 1.0 means slower decay.
+    private float knockbackDecayRate = 0.9f;
 
+    public int borbDamage = 1;
+    public int sporbDamage = 1;
+    private float sporbKnockbackPower = 6.0f;
+
+    public FoodCounter foodCounter;
 
 
     [SerializeField] private TrailRenderer trail;
@@ -42,37 +49,32 @@ public class player_script : MonoBehaviour
 
     private void Update()
     {
-        // Handle player movement
+        // Movement
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        // Gradually adjust the target velocity based on the current context
         float currentDirectionChangeSmoothness = isTouchingObject ? objectContactDirectionChangeSmoothness : directionChangeSmoothness;
         Vector2 inputDirection = new Vector2(horizontalInput, verticalInput).normalized;
         targetVelocity = Vector2.Lerp(targetVelocity, inputDirection * swimSpeed, Time.deltaTime * currentDirectionChangeSmoothness);
 
-        // Apply deceleration when no input is given
         if (inputDirection.magnitude < 0.1f)
         {
             targetVelocity = Vector2.Lerp(targetVelocity, Vector2.zero, Time.deltaTime * stoppingDeceleration);
         }
 
-        // Apply the target velocity when the player isn't dashing
         if (!isDashing)
         {
             rb.velocity = targetVelocity + knockbackVelocity;
         }
 
-        // Decay the knockback velocity
         knockbackVelocity *= knockbackDecayRate;
 
-        // If not touching an object, apply rotational damping
         if (!isTouchingObject)
         {
             rb.angularVelocity *= (1.0f - Time.deltaTime * rotationDamping);
         }
 
-        // Handle propulsion when pressing the spacebar
+        // Dash
         if (Input.GetKeyDown(KeyCode.Space) && canDash && !isBouncing)
         {
             // Start a dash
@@ -90,20 +92,12 @@ public class player_script : MonoBehaviour
     {
         if (health <= 0)
         {
-            // Here, you can trigger any event you want when the player "dies"
-            Debug.Log("Player is dead!");
-
-            // For now, I'll just deactivate the player
             this.gameObject.SetActive(false);
         }
     }
 
-
-    
-
     private void OnCollisionExit2D(Collision2D collision)
     {
-        // Reset the flag when no longer colliding with an object
         isTouchingObject = false;
     }
 
@@ -119,8 +113,8 @@ public class player_script : MonoBehaviour
         Vector2 dashDirection = new Vector2(horizontalInput, verticalInput).normalized;
 
 
-        // Define rayStart here
-        Vector2 rayStart = (Vector2)transform.position + dashDirection * 0.1f;  // Adjust the 0.1f offset as needed
+        // Define rayStart
+        Vector2 rayStart = (Vector2)transform.position + dashDirection * 0.1f; 
         // Raycast in the dash direction to check for obstacles
         Debug.DrawRay(rayStart, dashDirection * dashPower, Color.red, 5f);
         RaycastHit2D hit = Physics2D.Raycast(rayStart, dashDirection, dashPower - 0.1f, wallLayer);
@@ -154,18 +148,42 @@ public class player_script : MonoBehaviour
     {
         float originalGravity = rb.gravityScale;
 
+        // Borb handling
         if (collision.gameObject.tag == "borb")
         {
             Vector2 knockbackDirection = (transform.position - collision.transform.position).normalized;
-            knockbackVelocity = knockbackDirection * knockbackPower; // Use the knockbackPower variable you have
-
-            TakeDamage(1);
+            knockbackVelocity = knockbackDirection * borbKnockbackPower;
+            TakeDamage(borbDamage);
         }
 
-        // Set the flag when colliding with an object
+        // Sporb handling
+        if (collision.gameObject.tag == "sporb")
+        {
+            Vector2 knockbackDirection = (transform.position - collision.transform.position).normalized;
+            knockbackVelocity = knockbackDirection * sporbKnockbackPower; 
+            TakeDamage(sporbDamage);
+        }
+
+        if (collision.gameObject.tag == "gorb")
+        {
+            Debug.Log("Gorb hit! Food count: " + foodCounter.foodCount);
+            if (foodCounter.foodCount >= 100)
+            {
+                Destroy(collision.gameObject);
+            }
+        }
+
+        // Gorb handling (kill with 100 or more food)
+        if (collision.gameObject.tag == "gorb" && foodCounter.foodCount >= 100)
+        {
+            Destroy(collision.gameObject);
+
+            if (congratulationsText != null)
+            {
+                congratulationsText.gameObject.SetActive(true);
+            }
+        }
+
         isTouchingObject = true;
-
-
-
     }
 }

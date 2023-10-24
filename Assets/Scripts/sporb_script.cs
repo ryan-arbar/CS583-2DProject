@@ -15,6 +15,7 @@ public class sporb_script : MonoBehaviour
     Seeker seeker;
     Rigidbody2D rb;
     int currentWaypoint = 0;
+    public float nextWaypointDistance;
     Vector2 initialPosition;
 
     public float pathRefreshRate = .3f; // Time interval between path updates
@@ -90,7 +91,7 @@ public class sporb_script : MonoBehaviour
 
         float distance = Vector2.Distance(rb.position, path.vectorPath[currentWaypoint]);
 
-        if (distance < 0.5f)
+        if (distance < nextWaypointDistance)
         {
             currentWaypoint++;
         }
