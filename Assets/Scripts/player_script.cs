@@ -24,13 +24,13 @@ public class player_script : MonoBehaviour
     private bool isBouncing = false;
 
     public int health = 3000;
-    private float borbKnockbackPower = 5.0f;
+    public float borbKnockbackPower = 5.0f;
     private Vector2 knockbackVelocity;
     private float knockbackDecayRate = 0.9f;
 
     public int borbDamage = 1;
     public int sporbDamage = 1;
-    private float sporbKnockbackPower = 6.0f;
+    public float sporbKnockbackPower = 6.0f;
 
     public FoodCounter foodCounter;
 

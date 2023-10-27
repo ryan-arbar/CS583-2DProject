@@ -27,4 +27,11 @@ public class FoodCounter : MonoBehaviour
             foodCountText.text = "Food Eaten: " + foodCount;
         }
     }
+
+    public void DecreaseFoodCount(int amount)
+    {
+        foodCount -= amount;
+        if (foodCount < 0) foodCount = 0; // Prevent food count from going negative
+        UpdateFoodCountText();
+    }
 }

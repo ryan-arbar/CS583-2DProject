@@ -15,11 +15,18 @@ public class sucker_controller : MonoBehaviour
     private float lastTimePlayerInVicinity;
     private bool isFollowingPlayer;
 
+    public FoodCounter foodCounter;
+    public int scoreDecreaseAmount = 1;
+    public float scoreDecreaseInterval = 1f;
+    private float lastTimeScoreDecreased;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         lastTimePlayerInVicinity = Time.time;
         isFollowingPlayer = false;
+
+        lastTimeScoreDecreased = Time.time;
     }
 
     private void Update()
@@ -30,7 +37,7 @@ public class sucker_controller : MonoBehaviour
         {
             Vector2 directionToPlayer = (player.position - transform.position).normalized;
 
-            // Move the head toward the player.
+            // Move head toward player
             rb.velocity = directionToPlayer * moveSpeed;
 
             // Smoothly rotate the head to face player
@@ -45,19 +52,43 @@ public class sucker_controller : MonoBehaviour
         }
         else
         {
-            // Player is outside the vicinity.
+            // Player is outside the vicinity
             if (isFollowingPlayer && Time.time - lastTimePlayerInVicinity <= inertiaDuration)
             {
-                // Apply inertia to keep moving for a short duration
+                // inertia
                 rb.velocity = rb.velocity.normalized * moveSpeed;
             }
             else
             {
-                // Stop moving.
+                // Stop moving
                 rb.velocity = Vector2.zero;
                 isFollowingPlayer = false;
                 //Debug.Log("Player is outside radius");
             }
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.CompareTag("Player")) // Make sure the player's tag is set to "Player"
+        {
+            if (Time.time - lastTimeScoreDecreased > scoreDecreaseInterval)
+            {
+                if (foodCounter != null)
+                {
+                    foodCounter.DecreaseFoodCount(scoreDecreaseAmount);
+                    lastTimeScoreDecreased = Time.time;
+                }
+            }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (anchor != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(anchor.position, vicinityRadius);
         }
     }
 }
