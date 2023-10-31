@@ -7,14 +7,14 @@ public class food_script : MonoBehaviour
     public AudioClip pop;
 
     // Floating
-    public float floatAmplitudeMin = 0.1f;
-    public float floatAmplitudeMax = 0.3f;
+    private float floatAmplitudeMin = 0.1f;
+    private float floatAmplitudeMax = 0.3f;
     public float floatSpeedMin = 0.5f;
     public float floatSpeedMax = 2.0f;
 
     // Rotation
-    public float rotationSpeedMin = 10.0f;
-    public float rotationSpeedMax = 30.0f;
+    private float rotationSpeedMin = 10.0f;
+    private float rotationSpeedMax = 30.0f;
 
     // Wandering
     public float wanderDistance = 0.2f;

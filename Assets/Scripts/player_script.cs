@@ -24,16 +24,17 @@ public class player_script : MonoBehaviour
     private bool isBouncing = false;
 
     public int health = 3000;
-    public float borbKnockbackPower = 5.0f;
     private Vector2 knockbackVelocity;
     private float knockbackDecayRate = 0.9f;
 
     public int borbDamage = 1;
-    public int sporbDamage = 1;
+    public float borbKnockbackPower = 5.0f;
+    public int sporbDamage = 2;
     public float sporbKnockbackPower = 6.0f;
+    public int gorbDamage = 3;
+    public float gorbKnockbackPower = 10.0f;
 
     public FoodCounter foodCounter;
-
 
     [SerializeField] private TrailRenderer trail;
 
@@ -169,17 +170,8 @@ public class player_script : MonoBehaviour
             TakeDamage(sporbDamage);
         }
 
-        if (collision.gameObject.tag == "gorb")
-        {
-            Debug.Log("Gorb hit! Food count: " + foodCounter.foodCount);
-            if (foodCounter.foodCount >= 100)
-            {
-                Destroy(collision.gameObject);
-            }
-        }
-
-        // Gorb handling (kill with 100 or more food)
-        if (collision.gameObject.tag == "gorb" && foodCounter.foodCount >= 100)
+        // Gorb handling (kill with 150 or more food)
+        if (collision.gameObject.tag == "gorb" && foodCounter.foodCount >= 150)
         {
             Destroy(collision.gameObject);
 
@@ -187,6 +179,12 @@ public class player_script : MonoBehaviour
             {
                 congratulationsText.gameObject.SetActive(true);
             }
+
+        }else if (collision.gameObject.tag == "gorb")
+        {
+            Vector2 knockbackDirection = (transform.position - collision.transform.position).normalized;
+            knockbackVelocity = knockbackDirection * gorbKnockbackPower;
+            TakeDamage(gorbDamage);
         }
 
         isTouchingObject = true;

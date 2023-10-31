@@ -9,11 +9,8 @@ public class sucker_controller : MonoBehaviour
     public float moveSpeed = 5.0f;
     public float rotationSpeed = 10.0f;
     public float vicinityRadius = 5.0f;
-    public float inertiaDuration = 1.0f;
 
     private Rigidbody2D rb;
-    private float lastTimePlayerInVicinity;
-    private bool isFollowingPlayer;
 
     public FoodCounter foodCounter;
     public int scoreDecreaseAmount = 1;
@@ -23,8 +20,6 @@ public class sucker_controller : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        lastTimePlayerInVicinity = Time.time;
-        isFollowingPlayer = false;
 
         lastTimeScoreDecreased = Time.time;
     }
@@ -45,26 +40,14 @@ public class sucker_controller : MonoBehaviour
             Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
-            lastTimePlayerInVicinity = Time.time;
-            isFollowingPlayer = true;
-
             //Debug.Log("Player is in vicinity. Following player.");
         }
         else
         {
-            // Player is outside the vicinity
-            if (isFollowingPlayer && Time.time - lastTimePlayerInVicinity <= inertiaDuration)
-            {
-                // inertia
-                rb.velocity = rb.velocity.normalized * moveSpeed;
-            }
-            else
-            {
-                // Stop moving
-                rb.velocity = Vector2.zero;
-                isFollowingPlayer = false;
-                //Debug.Log("Player is outside radius");
-            }
+            // Stop moving
+            rb.velocity = Vector2.zero;
+            //Debug.Log("Player is outside radius");
+            
         }
     }
 
